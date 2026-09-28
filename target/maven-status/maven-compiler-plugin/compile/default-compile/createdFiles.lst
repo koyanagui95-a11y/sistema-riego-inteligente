@@ -1,6 +1,0 @@
-com\sistema\sistema_riego_inteligente\Entidad\Lectura.class
-com\sistema\sistema_riego_inteligente\repositorios\LecturaRepository.class
-com\sistema\sistema_riego_inteligente\servicios\ILecturaServicio.class
-com\sistema\sistema_riego_inteligente\SistemaRiegoInteligenteApplication.class
-com\sistema\sistema_riego_inteligente\servicios\LecturaServicioImpl.class
-com\sistema\sistema_riego_inteligente\controladores\LecturaControlador.class
