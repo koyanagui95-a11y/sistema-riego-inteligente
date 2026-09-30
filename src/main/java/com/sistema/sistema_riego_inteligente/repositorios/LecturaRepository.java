@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LecturaRepository extends JpaRepository<Lectura, Long> {
-    
-    
     Lectura findTopByOrderByIdDesc();
 }

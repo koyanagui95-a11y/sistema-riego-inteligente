@@ -5,6 +5,7 @@ package com.sistema.sistema_riego_inteligente.Entidad;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "lecturas")
@@ -26,7 +27,7 @@ public class Lectura implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        this.fechaRegistro = LocalDateTime.now();
+        this.fechaRegistro = LocalDateTime.now(ZoneId.of("America/Lima"));
     }
 
     public Lectura() {}

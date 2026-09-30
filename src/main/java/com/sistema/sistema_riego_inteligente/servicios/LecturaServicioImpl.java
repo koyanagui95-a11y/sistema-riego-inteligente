@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.time.ZoneId;
 
 @Service
 public class LecturaServicioImpl implements ILecturaServicio {
@@ -19,29 +20,21 @@ public class LecturaServicioImpl implements ILecturaServicio {
     public Lectura guardar(Lectura nuevaLectura) {
         Lectura ultimaLectura = lecturaRepositorio.findTopByOrderByIdDesc();
 
-        boolean debeGuardar = false;
-
         if (ultimaLectura == null) {
-            debeGuardar = true; // Primera lectura
-        } else {
-            // Usamos getBombaActiva() o Boolean.TRUE.equals() para evitar inconsistencias de tipos
-            boolean bombaNueva = Boolean.TRUE.equals(nuevaLectura.getBombaActiva());
-            boolean bombaUltima = Boolean.TRUE.equals(ultimaLectura.getBombaActiva());
-            
-            boolean cambioBomba = bombaNueva != bombaUltima;
-
-            boolean cambioHumedad = Math.abs(nuevaLectura.getHumedad() - ultimaLectura.getHumedad()) >= 2;
-
-            boolean tiempoExcedido = false;
-            if (ultimaLectura.getFechaRegistro() != null) {
-                long segundos = Duration.between(ultimaLectura.getFechaRegistro(), LocalDateTime.now()).getSeconds();
-                tiempoExcedido = segundos >= 300; // 5 minutos
-            }
-
-            debeGuardar = cambioBomba || cambioHumedad || tiempoExcedido;
+            return lecturaRepositorio.save(nuevaLectura);
         }
 
-        if (debeGuardar) {
+        boolean bombaNueva = Boolean.TRUE.equals(nuevaLectura.getBombaActiva());
+        boolean bombaUltima = Boolean.TRUE.equals(ultimaLectura.getBombaActiva());
+        boolean cambioBomba = bombaNueva != bombaUltima;
+
+        boolean tiempoExcedido = false;
+        if (ultimaLectura.getFechaRegistro() != null) {
+            long segundos = Duration.between(ultimaLectura.getFechaRegistro(), LocalDateTime.now(ZoneId.of("America/Lima"))).getSeconds();
+            tiempoExcedido = segundos >= 180;
+        }
+
+        if (cambioBomba || tiempoExcedido) {
             return lecturaRepositorio.save(nuevaLectura);
         }
 
