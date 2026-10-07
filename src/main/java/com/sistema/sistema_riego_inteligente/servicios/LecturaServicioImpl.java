@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.time.ZoneId;
+import java.util.List;
 
 @Service
 public class LecturaServicioImpl implements ILecturaServicio {
@@ -16,21 +16,38 @@ public class LecturaServicioImpl implements ILecturaServicio {
     @Autowired
     private LecturaRepository lecturaRepositorio;
 
+    private boolean bombaManual = false;
+
     @Override
     public Lectura guardar(Lectura nuevaLectura) {
-        Lectura ultimaLectura = lecturaRepositorio.findTopByOrderByIdDesc();
+
+        Lectura ultimaLectura =
+                lecturaRepositorio.findTopByOrderByIdDesc();
 
         if (ultimaLectura == null) {
             return lecturaRepositorio.save(nuevaLectura);
         }
 
-        boolean bombaNueva = Boolean.TRUE.equals(nuevaLectura.getBombaActiva());
-        boolean bombaUltima = Boolean.TRUE.equals(ultimaLectura.getBombaActiva());
-        boolean cambioBomba = bombaNueva != bombaUltima;
+        boolean bombaNueva =
+                Boolean.TRUE.equals(nuevaLectura.getBombaActiva());
+
+        boolean bombaUltima =
+                Boolean.TRUE.equals(ultimaLectura.getBombaActiva());
+
+        boolean cambioBomba =
+                bombaNueva != bombaUltima;
 
         boolean tiempoExcedido = false;
+
         if (ultimaLectura.getFechaRegistro() != null) {
-            long segundos = Duration.between(ultimaLectura.getFechaRegistro(), LocalDateTime.now(ZoneId.of("America/Lima"))).getSeconds();
+
+            long segundos = Duration.between(
+                    ultimaLectura.getFechaRegistro(),
+                    LocalDateTime.now(
+                            ZoneId.of("America/Lima")
+                    )
+            ).getSeconds();
+
             tiempoExcedido = segundos >= 300;
         }
 
@@ -48,16 +65,34 @@ public class LecturaServicioImpl implements ILecturaServicio {
 
     @Override
     public Lectura obtenerPorId(Long id) {
-        return lecturaRepositorio.findById(id).orElse(null);
+        return lecturaRepositorio
+                .findById(id)
+                .orElse(null);
     }
 
     @Override
     public Lectura obtenerUltimoEstado() {
-        return lecturaRepositorio.findTopByOrderByIdDesc();
+        return lecturaRepositorio
+                .findTopByOrderByIdDesc();
     }
 
     @Override
     public void eliminar(Long id) {
         lecturaRepositorio.deleteById(id);
+    }
+
+    @Override
+    public void activarManual() {
+        bombaManual = true;
+    }
+
+    @Override
+    public void desactivarManual() {
+        bombaManual = false;
+    }
+
+    @Override
+    public boolean estaActivaManual() {
+        return bombaManual;
     }
 }
